@@ -15,14 +15,11 @@ app.use(
 const PORT = process.env.PORT || 5000;
 const MONGODB = process.env.DB_URL;
 
-app.get("/", (req, res) => {
-  res.send("hello world");
-});
-
 app.get("/cribs", async (req, res) => {
   const client = new MongoClient(MONGODB);
   await client.connect();
   const results = await client.db("fyz").collection("cribs").find({}).toArray();
+  await client.close();
   res.send(results);
 });
 
@@ -33,6 +30,7 @@ app.post("/cribs", async (req, res) => {
     .db("fyz")
     .collection("cribs")
     .insertOne(req.body);
+    await client.close();
   res.send(results);
 });
 
@@ -43,6 +41,7 @@ app.delete("/cribs/:id", async (req, res) => {
     .db("fyz")
     .collection("cribs")
     .deleteOne({ _id: ObjectId(req.params.id) });
+    await client.close();
   res.send(results);
 });
 
@@ -53,6 +52,7 @@ app.put("/cribs/:id", async (req, res) => {
     .db("fyz")
     .collection("cribs")
     .updateOne({ _id: ObjectId(req.params.id) }, { $set: req.body });
+    await client.close();
   res.send(results);
 });
 
